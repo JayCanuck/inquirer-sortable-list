@@ -3,6 +3,8 @@
 
 This prompt supports navigation using arrow keys and reordering with `Ctrl` + `Up`/`Down`. `Enter` submits the changes or `Escape` to abort and return the original unchanged array.
 
+Inspired by [inquirer-sortable-checkbox](https://github.com/th0r/inquirer-sortable-checkbox).
+
 ### Installation
 Install the package using npm or yarn:
 
