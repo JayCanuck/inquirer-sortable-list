@@ -69,7 +69,7 @@ The `theme` object allows customizing the appearance of the pointer and highligh
 | Property           | Type                          | Description                                                           |
 |--------------------|-------------------------------|-----------------------------------------------------------------------|
 | `icon.cursor`      | `string`                      | The string used for the cursor/pointer (default: `❯`).                |
-| `style.highlight`  | `(text: string) => string`    | A function to style the active (highlighted) item (default: bold ).   |
+| `style.highlight`  | `(text: string) => string`    | A function to style the active item (default: bold ).                 |
 
 ### Example Output
 Before Reordering:
@@ -94,8 +94,6 @@ After Reordering (`Ctrl + Down` on "Option 1"):
 
 ### License Information
 
-Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at
+Licensed under the Apache License, Version 2.0:
 
 http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
