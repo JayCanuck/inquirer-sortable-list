@@ -51,7 +51,7 @@ import {
   makeTheme,
   isUpKey,
   isDownKey,
-  isEnterKey,
+  isEnterKey
 } from '@inquirer/core';
 import chalk from 'chalk';
 import figures from '@inquirer/figures';
@@ -63,10 +63,8 @@ type ReorderListTheme = {
 };
 
 const defaultTheme: ReorderListTheme = {
-  icon: { cursor: chalk.green(figures.pointer) }, // Pointer styled in green
-  style: {
-    highlight: chalk.bold, // Highlight active item with bold text
-  },
+  icon: { cursor: chalk.green(figures.pointer) },
+  style: { highlight: chalk.bold }
 };
 
 type Config = {
@@ -80,60 +78,59 @@ function isEscapeKey(key: { name?: string }): boolean {
   return key.name === 'escape';
 }
 
-export default createPrompt(
-  (config: Config, done: (value: Array<string>) => void) => {
-    const { message, choices, pageSize = 7, theme: customTheme } = config;
-    const theme = makeTheme<ReorderListTheme>({ ...defaultTheme, ...(customTheme || {}) });
-    const prefix = usePrefix({ theme });
+export default createPrompt((config: Config, done: (value: Array<string>) => void) => {
+  const { message, choices, pageSize = 7, theme: customTheme } = config;
+  const theme = makeTheme<ReorderListTheme>({ ...defaultTheme, ...(customTheme || {}) });
+  const prefix = usePrefix({ theme });
 
-    const [items, setItems] = useState(choices);
-    const [active, setActive] = useState(0);
-    const originalOrder = [...choices]; // Store the original order for escape
+  const [items, setItems] = useState(choices);
+  const [active, setActive] = useState(0);
+  const originalOrder = [...choices]; // Store the original order for escape
 
-    if (items.length === 0) {
-      return `${prefix} ${message}\n(No items to display)`;
-    }
+  if (items.length === 0) {
+    return `${prefix} ${message}\n(No items to display)`;
+  }
 
-    useKeypress((key) => {
-      if (isEscapeKey(key)) {
-        done(originalOrder); // Exit without changes
-      } else if (isEnterKey(key)) {
-        done(items); // Submit reordered list
-      } else if (isUpKey(key) || isDownKey(key)) {
-        const offset = isUpKey(key) ? -1 : 1;
-        if (key.ctrl) {
-          // Reorder the items with Ctrl + Arrow
-          const newIndex = active + offset;
-          if (newIndex >= 0 && newIndex < items.length) {
-            const newItems = [...items];
-            [newItems[active], newItems[newIndex]] = [
-              newItems[newIndex],
-              newItems[active],
-            ];
-            setItems(newItems);
-            setActive(newIndex); // Update active position
-          }
-        } else {
-          // Navigate the list
-          setActive((active + offset + items.length) % items.length);
+  useKeypress(key => {
+    if (isEscapeKey(key)) {
+      done(originalOrder); // Exit without changes
+    } else if (isEnterKey(key)) {
+      done(items); // Submit reordered list
+    } else if (isUpKey(key) || isDownKey(key)) {
+      const offset = isUpKey(key) ? -1 : 1;
+
+      if (key.ctrl) {
+        // Reorder the items with Ctrl + Arrow
+        const newIndex = active + offset;
+        if (newIndex >= 0 && newIndex < items.length) {
+          const newItems = [...items];
+          [newItems[active], newItems[newIndex]] = [newItems[newIndex], newItems[active]];
+          setItems(newItems);
+          setActive(newIndex); // Update active position
+        }
+      } else {
+        // Navigate the list
+        const newActive = active + offset;
+        if (newActive >= 0 && newActive < items.length) {
+          setActive(newActive);
         }
       }
-    });
+    }
+  });
 
-    const page = usePagination({
-      items,
-      active,
-      renderItem({ item, isActive }) {
-        const cursor = isActive ? theme.icon.cursor : ' ';
-        const color = isActive ? theme.style.highlight : (text: string) => text;
+  const page = usePagination({
+    items,
+    active,
+    renderItem({ item, isActive }) {
+      const cursor = isActive ? theme.icon.cursor : ' ';
+      const color = isActive ? theme.style.highlight : (text: string) => text;
 
-        return color(`${cursor} ${item}`);
-      },
-      pageSize,
-      loop: true,
-    });
+      return color(`${cursor} ${item}`);
+    },
+    pageSize,
+    loop: false // Disable loop
+  });
 
-    const helperMessage = `(Use arrow keys to navigate, ctrl+up/down to reorder, enter to confirm, escape to cancel)`;
-    return `${prefix} ${message}\n${page}\n${helperMessage}${ansiEscapes.cursorHide}`;
-  }
-);
+  const helperMessage = `(Use arrow keys to navigate, ctrl+up/down to reorder, enter to confirm, escape to cancel)`;
+  return `${prefix} ${message}\n${page}\n${helperMessage}${ansiEscapes.cursorHide}`;
+});
